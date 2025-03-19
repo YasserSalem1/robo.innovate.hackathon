@@ -1,3 +1,4 @@
+import random
 
 def get_ndvi_value():
     # TODO Implement logic to get NDVI value from camera

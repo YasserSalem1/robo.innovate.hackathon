@@ -4,9 +4,9 @@ import random
 from hydrate_and_fertilize import hydrate_fertilize_tree
 from write_to_db import write_to_db, write_log_to_db
 from ir_camera import get_ndvi_value
-from soil_and_hum_sensors import get_avg_measurement_outputs, Sensor
+from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor
 
-"""write me a code that will run until interrupted by command c and wich will watch the measurement of sensor1. if the value for value1 of this sensor1 > 0 it starts a second thread in parallel. it notes down time0 and then appends all values of sensor1 and sensor two in a dictionary meas_dict with lists until the value1 of sensor1 drops to 0 again.
+"""write me a code that will run until interrupted by command c and wich will watch the measurement of humidity_sensor. if the value for value1 of this humidity_sensor > 0 it starts a second thread in parallel. it notes down time0 and then appends all values of humidity_sensor and sensor two in a dictionary meas_dict with lists until the value1 of humidity_sensor drops to 0 again.
 it notes down the measurement time t_meas = time.time() -t0
 it then calls get_avg_measurement_outputs(meas_dict) which will return a dictionary with the averaged values of the measurements avg_meas_dict.
 the function water_fertilize_tree(avg_meas_dict) which will then water and/or fertilize the tree and return a water_fertilize_dict.
@@ -16,34 +16,40 @@ also logs of what is going on are constantly written into the log table in the d
 # main application file, runs the whole time
 
 
-sensor1 = Sensor(sensor_type = 'humidity')
-sensor2 = Sensor(sensor_type = 'soil')
+humidity_sensor = HumiditySensor(arduino_port='/dev/ttyACM0')
+soil_sensor = SoilSensor(arduino_port='/dev/ttyACM0')
 
 def monitor_sensors():
     while True:
-        if sensor1.read(measurement_key = 'humidity') > 0:
+        if humidity_sensor.get_only_hum_value() > 0:
             t0 = time.time()
-            meas_dict1 = {}
-            meas_dict2 = {}
-            for meas_key in sensor1.measurement_keys:
-                meas_dict1.update({meas_key: []})
-            for meas_key in sensor2.measurement_keys:
-                meas_dict2.update({meas_key: []})
+            humidity_meas_dict = {}
+            soil_meas_dict = {}
+            for meas_key in humidity_sensor.measurement_keys:
+                humidity_meas_dict.update({meas_key: []})
+            for meas_key in soil_sensor.measurement_keys:
+                soil_meas_dict.update({meas_key: []})
             write_log_to_db("Humidity > 0, starting measurement.")
             
-            while sensor1.read(measurement_key = 'humidity') > 0:
+            while humidity_sensor.get_only_hum_value() > 0:
                 t_meas = time.time() - t0
-                for key in meas_dict1.keys():
-                    meas_dict1[key].append(sensor1.read(measurement_key = key))
-                for key in meas_dict2.keys():
-                    meas_dict2[key].append(sensor2.read(measurement_key = key))
+                hum_sensor_data_dict = humidity_sensor.read()
+                soil_sensor_data_dict = soil_sensor.read()
+                for key, value in hum_sensor_data_dict.items():
+                    humidity_meas_dict[key].append(value)
+                for key, value in soil_sensor_data_dict.items():
+                    soil_meas_dict[key].append(value)
                 time.sleep(0.3)  # Simulate sensor reading interval
-            avg_meas_dict = get_avg_measurement_outputs({**meas_dict1, **meas_dict2})
+            total_meas_time = time.time() - t0
+            write_log_to_db(f"Measurement completed after {total_meas_time} seconds.")
+            write_log_to_db(f"Analysing measured data, then fertilize and hydrate.")
+            avg_meas_dict = get_avg_measurement_outputs({**humidity_meas_dict, **soil_meas_dict})
             hydration_fertilize_dict = hydrate_fertilize_tree(avg_meas_dict)
+            write_log_to_db(f"Hydration and fertilize completed, taking foto and calculating ndvi-value.")
             foto_arr, ndvi_val = get_ndvi_value()
-            write_to_db(hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val)
-            write_log_to_db("Measurement completed and data written to DB.")
-        time.sleep(0.3)  # Check sensor1 value every second
+            write_to_db(total_meas_time, hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val, )
+            write_log_to_db("Overall measurement completed and data written to DB.")
+        time.sleep(0.3)  # Check humidity_sensor value every second
 
 if __name__ == "__main__":
     try:

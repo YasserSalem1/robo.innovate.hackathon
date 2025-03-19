@@ -6,6 +6,8 @@ from picamera2 import Picamera2
 from libcamera import controls
 import cv2
 from fastiecm import fastiecm
+import datetime
+from scp_image import send_image_scp
 
 def contrast_stretch(im):
     in_min = np.percentile(im, 5)
@@ -32,9 +34,6 @@ def calc_ndvi(image):
 
 def get_ndvi_value():
     # Inputs for the picture - informatio nsuch as tree id
-    tree_id = "31"
-    save_path = ""
-
     # Set up camera
     picam2 = Picamera2()
 
@@ -45,10 +44,26 @@ def get_ndvi_value():
     time.sleep(1)
 
     # Take pictures
-    image_filename = f"{save_path}{tree_id}.jpg"
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    image_filename = f"./output/{timestamp}_tree.jpg"
     picam2.capture_file(image_filename)
 
     image = cv2.imread(image_filename) # load image
+
+    # remote_path = "/path/to/remote/image.jpg"
+    # hostname = "example.com"
+    # port = 22
+    # username = "your_username"
+    # password = "your_password"
+
+    # send_image_scp(
+    #     image_path=image_filename,
+    #     remote_path=remote_path, 
+    #     hostname=hostname,
+    #     port=port, 
+    #     username=username, 
+    #     password=password,
+    # )
     image = np.array(image, dtype=float)/float(255) #convert to an array
 
     contrasted = contrast_stretch(image)
@@ -56,14 +71,14 @@ def get_ndvi_value():
     mean_ndvi = np.mean(ndvi) * (-1)
     print(f"Mean NDVI: {mean_ndvi}")
 
-    cv2.imwrite('ndvi.png', ndvi)
+    cv2.imwrite(f"./output/{timestamp}_tree_ndvi.png", ndvi)
 
     ndvi_contrasted = contrast_stretch(ndvi)
-    cv2.imwrite('ndvi_contrasted.png', ndvi_contrasted)
+    cv2.imwrite(f"./output/{timestamp}_tree_ndvi_contrasted.png", ndvi_contrasted)
 
     color_mapped_prep = ndvi_contrasted.astype(np.uint8)
     color_mapped_image = cv2.applyColorMap(color_mapped_prep, fastiecm)
-    cv2.imwrite('color_mapped_image.png', color_mapped_image)
+    cv2.imwrite(f"./output/{timestamp}_tree_color_mapped_image.png", color_mapped_image)
 
     #stream = picam2.array.PiRGBArray(cam)
     #cam.capture(stream, format='bgr', use_video_port=True)
@@ -73,7 +88,7 @@ def get_ndvi_value():
 
     # Get metadata
     metadata = picam2.capture_metadata()
-    metadata_filename = f"{save_path}{tree_id}_meta.txt"
+    metadata_filename = f"./output/{timestamp}_tree_meta.txt"
 
     with open(metadata_filename, "w") as meta_file:
         for key, value in metadata.items():

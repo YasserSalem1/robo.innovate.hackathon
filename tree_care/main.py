@@ -7,13 +7,6 @@ from write_to_db import write_to_db, write_log_to_db
 from ir_camera import get_ndvi_value
 from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor, DemoHumiditySensor, DemoSoilSensor
 
-"""write me a code that will run until interrupted by command c and wich will watch the measurement of humidity_sensor. if the value for value1 of this humidity_sensor > 0 it starts a second thread in parallel. it notes down time0 and then appends all values of humidity_sensor and sensor two in a dictionary meas_dict with lists until the value1 of humidity_sensor drops to 0 again.
-it notes down the measurement time t_meas = time.time() -t0
-it then calls get_avg_measurement_outputs(meas_dict) which will return a dictionary with the averaged values of the measurements avg_meas_dict.
-the function water_fertilize_tree(avg_meas_dict) which will then water and/or fertilize the tree and return a water_fertilize_dict.
-it will then call get_ndvi_value() which returns an foto_arr and a ndvi_val.
-at the end it will call write_to_db(water_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val) which will write the results into the db.
-also logs of what is going on are constantly written into the log table in the db with a function write_log_to_db(log_msg)"""
 # main application file, runs the whole time
 demo_mode = False
 raspberry_pi = True

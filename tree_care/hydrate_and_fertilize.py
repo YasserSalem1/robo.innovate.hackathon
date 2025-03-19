@@ -48,23 +48,23 @@ def get_hydration_and_fertilizer_seconds_values(avg_meas_dict):
     # These thresholds and calculations are arbitrary and should be adjusted based on real requirements
     # Hydration logic based on humidity (HUM)
     if avg_meas_dict['HUM'] < 30:
-        hydration_seconds = 4
+        hydration_seconds = 5
     elif avg_meas_dict['HUM'] < 50:
-        hydration_seconds = 3
+        hydration_seconds = 4
     elif avg_meas_dict['HUM'] < 70:
-        hydration_seconds = 2
+        hydration_seconds = 3
     else:
-        hydration_seconds = 1
+        hydration_seconds = 2
 
     # Fertilizer logic based on Nitrat (N), Kalium (K), and Phosphor (P)
     if avg_meas_dict['N'] < 10 or avg_meas_dict['K'] < 10 or avg_meas_dict['P'] < 10:
-        fertilizer_seconds = 4
+        fertilizer_seconds = 5
     elif avg_meas_dict['N'] < 20 or avg_meas_dict['K'] < 20 or avg_meas_dict['P'] < 20:
-        fertilizer_seconds = 3
+        fertilizer_seconds = 4
     elif avg_meas_dict['N'] < 30 or avg_meas_dict['K'] < 30 or avg_meas_dict['P'] < 30:
-        fertilizer_seconds = 2
+        fertilizer_seconds = 3
     else:
-        fertilizer_seconds = 1
+        fertilizer_seconds = 2
     # # TODO: Implement logic to calculate hydration and fertilizer seconds based on avg_meas_dict
     # hydration_seconds = random.uniform(0, 4)
     # fertilizer_seconds = random.uniform(0, 4)

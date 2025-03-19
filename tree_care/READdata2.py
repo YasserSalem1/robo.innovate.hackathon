@@ -89,7 +89,7 @@ last_id = last_record.get("ID")  # Extract only the ID
 print(last_id)  # Output: 12
 
 # Replace 'COM3' with the correct port (Windows: COMx, Linux/macOS: /dev/ttyUSBx or /dev/ttyACMx)
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+ser = serial.Serial('/dev/tty.usbmodem1413101', 9600, timeout=1)
 
 # second sensor
 # Modbus request commands
@@ -100,7 +100,7 @@ Com_K = [0x01, 0x03, 0x00, 0x20, 0x00, 0x01, 0x85, 0xC0]  # K
 N_values = []
 P_values = []
 K_values = []
-ser2= serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+ser2= serial.Serial('/dev/tty.usbmodem1413101', 9600, timeout=1)
 
 # Function to Fetch Data
 def fetch_records():
@@ -144,7 +144,7 @@ def read_K():
     return send_command(Com_K)
 
 # Define folder path
-folder_name = r"/home/mirmihackathon/Desktop/"  # Use raw string (r"") to avoid escape issues
+folder_name = "."  # Use raw string (r"") to avoid escape issues
 
 # Create the directory if it doesn't exist
 if not os.path.exists(folder_name):

@@ -1,9 +1,6 @@
-import serial
-import time
-import threading
-from datetime import datetime
 import requests
 import json
+from datetime import datetime
 
 # Airtable API Details
 AIRTABLE_PAT = "patSZ2hnMBit4Db56.13a6845603b208a4ae3454d52ed7f0b3e7dc3117e56f6f64379fc9ffedb0ed53"
@@ -61,58 +58,16 @@ def send_to_airtable(data):
 
 # Send the dummy data to Airtable
 send_to_airtable(row_data)
+    # Send data to Airtable after the action
+    row_data.update(sensor_data)
+    send_to_airtable(row_data)
 
-# Function to control a pump
-def control_pump(pump, seconds, arduino):
-    if pump == 'fertilize':
-        pin = 2
-    elif pump == 'hydrate':
-        pin = 7
-    else:
-        print("Invalid pump type. Use 'fertilize' or 'hydrate'.")
-        return
+def write_to_db(hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val):
+    print("Writing to DB:", hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val)
 
-    # Turn pump ON
-    command_on = f"{pin} HIGH\n"
-    arduino.write(command_on.encode())
-    print(f"Sent: {command_on.strip()}")
-    time.sleep(seconds)
+def write_log_to_db(log_msg):
+    print("Log:", log_msg)
 
-    # Turn pump OFF
-    command_off = f"{pin} LOW\n"
-    arduino.write(command_off.encode())
-    print(f"Sent: {command_off.strip()}")
-
-    time.sleep(0.1)  # Allow Arduino to process
-    arduino.flush()  # Clear buffer
-
-# Function to control both pumps
-def control_both_pumps(fertilize_seconds, hydrate_seconds, arduino):
-    fertilize_thread = threading.Thread(target=control_pump, args=("fertilize", fertilize_seconds, arduino))
-    hydrate_thread = threading.Thread(target=control_pump, args=("hydrate", hydrate_seconds, arduino))
-    
-    fertilize_thread.start()
-    hydrate_thread.start()
-    
-    fertilize_thread.join()
-    hydrate_thread.join()
-
-if __name__ == '__main__':
-    # Replace with your Arduino's serial port (e.g., COM3 on Windows or /dev/ttyUSB0 on Linux)
-    arduino = serial.Serial('/dev/ttyUSB0', 9600)
-
-    # Wait for the Arduino to initialize
-    time.sleep(2)
-
-    # Control individual pumps
-    control_pump(pump='hydrate', seconds=5, arduino=arduino)
-    control_pump(pump='fertilize', seconds=2, arduino=arduino)
-
-    # Control both pumps simultaneously
-    control_both_pumps(fertilize_seconds=4, hydrate_seconds=6, arduino=arduino)
-
-    # Close the Arduino serial connection
-    arduino.close()
 
     # Real-time data logging
     # Fetch data (e.g., sensor data, to be used for logging and sending to Airtable)
@@ -124,6 +79,3 @@ if __name__ == '__main__':
         "pH": 6.4             # Example pH value
     }
 
-    # Send data to Airtable after the action
-    row_data.update(sensor_data)
-    send_to_airtable(row_data)

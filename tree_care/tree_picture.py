@@ -94,4 +94,3 @@ with open(metadata_filename, "w") as meta_file:
 
 picam2.stop_preview()
 picam2.stop()
-

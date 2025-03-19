@@ -2,8 +2,8 @@ import threading
 import time
 import random
 from hydrate_and_fertilize import hydrate_fertilize_tree
-from write_to_db_demo import write_to_db, write_log_to_db
-# from write_to_db import write_to_db, write_log_to_db
+# from write_to_db_demo import write_to_db, write_log_to_db
+from write_to_db import write_to_db, write_log_to_db
 from ir_camera import get_ndvi_value
 from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor, DemoHumiditySensor, DemoSoilSensor
 
@@ -16,13 +16,13 @@ at the end it will call write_to_db(water_fertilize_dict, avg_meas_dict, foto_ar
 also logs of what is going on are constantly written into the log table in the db with a function write_log_to_db(log_msg)"""
 # main application file, runs the whole time
 demo_mode = False
-raspberry_pi = False
+raspberry_pi = True
 if demo_mode:
     humidity_sensor = DemoHumiditySensor()
     soil_sensor = DemoSoilSensor()
 elif raspberry_pi:
     humidity_sensor = HumiditySensor(arduino_port='/dev/ttyACM0')
-    soil_sensor = SoilSensor(arduino_port='/dev/ttyACM0')
+    soil_sensor = SoilSensor(arduino_port='/dev/ttyACM1')
 else:
     humidity_sensor = HumiditySensor(arduino_port='/dev/tty.usbmodem141101')
     soil_sensor = SoilSensor(arduino_port='/dev/tty.usbmodem142101')
@@ -31,7 +31,7 @@ def monitor_sensors():
     while True:
         print(humidity_sensor.read())
         print(soil_sensor.read())
-        if humidity_sensor.get_only_hum_value() > 0:
+        if humidity_sensor.get_only_hum_value() > 7:
             t0 = time.time()
             humidity_meas_dict = {}
             soil_meas_dict = {}

@@ -3,6 +3,7 @@ import time
 import random
 from hydrate_and_fertilize import hydrate_fertilize_tree
 from write_to_db_demo import write_to_db, write_log_to_db
+# from write_to_db import write_to_db, write_log_to_db
 from ir_camera import get_ndvi_value
 from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor, DemoHumiditySensor, DemoSoilSensor
 
@@ -14,13 +15,17 @@ it will then call get_ndvi_value() which returns an foto_arr and a ndvi_val.
 at the end it will call write_to_db(water_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val) which will write the results into the db.
 also logs of what is going on are constantly written into the log table in the db with a function write_log_to_db(log_msg)"""
 # main application file, runs the whole time
-demo_mode = True
+demo_mode = False
+raspberry_pi = False
 if demo_mode:
     humidity_sensor = DemoHumiditySensor()
     soil_sensor = DemoSoilSensor()
-else:
+elif raspberry_pi:
     humidity_sensor = HumiditySensor(arduino_port='/dev/ttyACM0')
     soil_sensor = SoilSensor(arduino_port='/dev/ttyACM0')
+else:
+    humidity_sensor = HumiditySensor(arduino_port='/dev/tty.usbmodem141101')
+    soil_sensor = SoilSensor(arduino_port='/dev/tty.usbmodem142101')
 
 def monitor_sensors():
     while True:
@@ -36,15 +41,17 @@ def monitor_sensors():
                 soil_meas_dict.update({meas_key: []})
             write_log_to_db("Humidity > 0, starting measurement.")
             
-            while humidity_sensor.get_only_hum_value() > 0:
+            while time.time() - t0 < 6:
                 t_meas = time.time() - t0
                 hum_sensor_data_dict = humidity_sensor.read()
+                print(hum_sensor_data_dict)
                 soil_sensor_data_dict = soil_sensor.read()
+                print(soil_sensor_data_dict)
                 for key, value in hum_sensor_data_dict.items():
                     humidity_meas_dict[key].append(value)
                 for key, value in soil_sensor_data_dict.items():
                     soil_meas_dict[key].append(value)
-                time.sleep(0.3)  # Simulate sensor reading interval
+                time.sleep(1)  # Simulate sensor reading interval
             total_meas_time = time.time() - t0
             write_log_to_db(f"Measurement completed after {total_meas_time} seconds.")
             write_log_to_db(f"Analysing measured data, then fertilize and hydrate.")
@@ -54,7 +61,7 @@ def monitor_sensors():
             foto_arr, ndvi_val = get_ndvi_value()
             write_to_db(total_meas_time, hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val, )
             write_log_to_db("Overall measurement completed and data written to DB.")
-        time.sleep(0.3)  # Check humidity_sensor value every second
+        time.sleep(1)  # Check humidity_sensor value every second
 
 if __name__ == "__main__":
     try:

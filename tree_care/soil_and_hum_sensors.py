@@ -4,17 +4,68 @@ import re
 import os
 import numpy as np
 import struct
+import random
 
 # Mock functions for the required operations
 def get_avg_measurement_outputs(meas_dict):
-    avg_meas_dict = {key: sum(values)/len(values) for key, values in meas_dict.items()}
+    avg_meas_dict = {key: sum(values)/np.min([1, len(values)]) for key, values in meas_dict.items()}
     return avg_meas_dict
+
+class DemoSoilSensor:
+    def __init__(self):
+        self.sensor_type = 'Soil'
+        self.measurement_keys = ['N', 'K', 'P']
+        self.n_meas = None
+        self.k_meas = None
+        self.p_meas = None
+        self.update_measurements()
+
+    def update_measurements(self):
+        self.n_meas = random.uniform(0, 100)
+        self.k_meas = random.uniform(0, 100)
+        self.p_meas = random.uniform(0, 100)
+
+    def read(self):
+        self.update_measurements()
+        return {
+            'N': self.n_meas,
+            'K': self.k_meas,
+            'P': self.p_meas
+        }
+
+class DemoHumiditySensor:
+    def __init__(self):
+        self.sensor_type = 'Humidity'
+        self.measurement_keys = ['HUM', 'TEM', 'PH', 'EC']
+        self.hum_meas = None
+        self.tem_meas = None
+        self.ph_meas = None
+        self.ec_meas = None
+        self.update_measurements()
+
+    def get_only_hum_value(self):
+        return random.uniform(-10, 10)
+    
+    def update_measurements(self):
+        self.hum_meas = random.uniform(0, 100)
+        self.tem_meas = random.uniform(-10, 50)
+        self.ph_meas = random.uniform(0, 14)
+        self.ec_meas = random.uniform(0, 10)
+
+    def read(self):
+        self.update_measurements()
+        return {
+            'HUM': self.hum_meas,
+            'TEM': self.tem_meas,
+            'PH': self.ph_meas,
+            'EC': self.ec_meas,
+        }
 
 class SoilSensor:
     def __init__(self, arduino_port): # on raspy: '/dev/ttyACM0'
         # Replace 'COM3' with the correct port (Windows: COMx, Linux/macOS: /dev/ttyUSBx or /dev/ttyACMx)
         self.sensor_type = 'Soil'
-        measurement_keys = ['N', 'K', 'P']
+        self.measurement_keys = ['N', 'K', 'P']
         self.arduino = serial.Serial(arduino_port, 9600, timeout=1)
         time.sleep(2)
         self.n_meas = None
@@ -60,8 +111,8 @@ class SoilSensor:
 class HumiditySensor:
     def __init__(self, arduino_port): # on raspy: '/dev/ttyACM0'
         # Replace 'COM3' with the correct port (Windows: COMx, Linux/macOS: /dev/ttyUSBx or /dev/ttyACMx)
-        self.sensor_type = 'Soil'
-        measurement_keys = ['HUM', 'TEM', 'PH', 'EC']
+        self.sensor_type = 'Humidity'
+        self.measurement_keys = ['HUM', 'TEM', 'PH', 'EC']
         self.arduino = serial.Serial(arduino_port, 9600, timeout=1)
         time.sleep(2)
         self.hum_meas = None

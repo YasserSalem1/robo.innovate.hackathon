@@ -2,9 +2,9 @@ import threading
 import time
 import random
 from hydrate_and_fertilize import hydrate_fertilize_tree
-from write_to_db import write_to_db, write_log_to_db
+from write_to_db_demo import write_to_db, write_log_to_db
 from ir_camera import get_ndvi_value
-from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor
+from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor, DemoHumiditySensor, DemoSoilSensor
 
 """write me a code that will run until interrupted by command c and wich will watch the measurement of humidity_sensor. if the value for value1 of this humidity_sensor > 0 it starts a second thread in parallel. it notes down time0 and then appends all values of humidity_sensor and sensor two in a dictionary meas_dict with lists until the value1 of humidity_sensor drops to 0 again.
 it notes down the measurement time t_meas = time.time() -t0
@@ -14,13 +14,18 @@ it will then call get_ndvi_value() which returns an foto_arr and a ndvi_val.
 at the end it will call write_to_db(water_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val) which will write the results into the db.
 also logs of what is going on are constantly written into the log table in the db with a function write_log_to_db(log_msg)"""
 # main application file, runs the whole time
-
-
-humidity_sensor = HumiditySensor(arduino_port='/dev/ttyACM0')
-soil_sensor = SoilSensor(arduino_port='/dev/ttyACM0')
+demo_mode = True
+if demo_mode:
+    humidity_sensor = DemoHumiditySensor()
+    soil_sensor = DemoSoilSensor()
+else:
+    humidity_sensor = HumiditySensor(arduino_port='/dev/ttyACM0')
+    soil_sensor = SoilSensor(arduino_port='/dev/ttyACM0')
 
 def monitor_sensors():
     while True:
+        print(humidity_sensor.read())
+        print(soil_sensor.read())
         if humidity_sensor.get_only_hum_value() > 0:
             t0 = time.time()
             humidity_meas_dict = {}

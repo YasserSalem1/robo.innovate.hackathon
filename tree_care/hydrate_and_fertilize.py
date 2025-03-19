@@ -72,9 +72,10 @@ def get_hydration_and_fertilizer_seconds_values(avg_meas_dict):
 
 def hydrate_fertilize_tree(avg_meas_dict):
     hydration_seconds, fertilizer_seconds = get_hydration_and_fertilizer_seconds_values(avg_meas_dict)
-    arduino = serial.Serial('/dev/ttyUSB0', 9600)
+    #arduino = serial.Serial('/dev/ttyUSB0', 9600)
+    arduino = serial.Serial('/dev/tty.usbserial-B0015QAP', 9600)
     # Wait for the Arduino to initialize
-    time.sleep(1)
+    time.sleep(2)
     if hydration_seconds > 0 and fertilizer_seconds > 0:
         control_both_pumps(fertilize_seconds=fertilizer_seconds, hydrate_seconds=hydration_seconds, arduino=arduino)
     elif hydration_seconds > 0:
@@ -92,7 +93,8 @@ def hydrate_fertilize_tree(avg_meas_dict):
 
 if __name__ == '__main__':
     # Replace with your Arduino's serial port (e.g., COM3 on Windows or /dev/ttyUSB0 on Linux)
-    arduino = serial.Serial('/dev/ttyUSB0', 9600)
+    #arduino = serial.Serial('/dev/ttyUSB0', 9600)
+    arduino = serial.Serial('/dev/tty.usbserial-B0015QAP', 9600)
 
     # Wait for the Arduino to initialize
     time.sleep(2)
@@ -105,4 +107,14 @@ if __name__ == '__main__':
     # Close the Arduino serial connection
     arduino.close()
 
-    hydrate_fertilize_tree({"moisture": 50, "temperature": 25, "light": 500})
+    hydrate_fertilize_tree(
+        {
+            'HUM': 31.85155849933511,
+            'TEM': 10.742406770876368,
+            'PH': 11.769778653356132,
+            'EC': 6.258415728158027,
+            'N': 44.26549355396079,
+            'K': 55.90387106814525,
+            'P': 91.82894587693659
+        }
+    )

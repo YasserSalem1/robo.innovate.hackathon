@@ -4,18 +4,19 @@ import random
 from hydrate_and_fertilize import hydrate_fertilize_tree
 # from write_to_db_demo import write_to_db, write_log_to_db
 from write_to_db import write_to_db, write_log_to_db
-from ir_camera import get_ndvi_value, get_ndvi_value_demo
 from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, HumiditySensor, DemoHumiditySensor, DemoSoilSensor
 
 HUMIDITY_SENSOR_THRESHOLD = 7
 
-# main application file, runs the whole time
-demo_mode = False
+demo_mode = True
 raspberry_pi = True
 camera_demo_mode = True
+
+
 if demo_mode:
     humidity_sensor = DemoHumiditySensor()
     soil_sensor = DemoSoilSensor()
+    pump_arduino_port = 'DEMO'
 elif raspberry_pi:
     humidity_sensor = HumiditySensor(arduino_port='/dev/ttyACM1')
     soil_sensor = SoilSensor(arduino_port='/dev/ttyACM0')
@@ -25,12 +26,20 @@ else:
     soil_sensor = SoilSensor(arduino_port='/dev/tty.usbmodem142101')
     pump_arduino_port = '/dev/tty.usbserial-B0015QAP'
 
+if camera_demo_mode:
+    def get_ndvi_value():
+        # TODO Implement logic to get NDVI value from camera
+        foto_arr = [random.randint(0, 255) for _ in range(100)]
+        ndvi_val = random.uniform(0, 1)
+        return foto_arr, ndvi_val
+else:
+    from ir_camera import get_ndvi_value
+
 def monitor_sensors():
     while True:
-        print(f"🔍 Sensors in soil? {humidity_sensor.get_only_hum_value() > HUMIDITY_SENSOR_THRESHOLD}")
-        # print(humidity_sensor.read())
-        # print(soil_sensor.read())
-        if humidity_sensor.get_only_hum_value() > HUMIDITY_SENSOR_THRESHOLD:
+        humidity_meas_value = humidity_sensor.get_only_hum_value()
+        print(f"🔍 Sensors in soil? {humidity_meas_value > HUMIDITY_SENSOR_THRESHOLD}")
+        if humidity_meas_value > HUMIDITY_SENSOR_THRESHOLD:
             t0 = time.time()
             write_log_to_db(f"🚀 Yeahaa: Sensors in soil, starting measurement!")
             humidity_meas_dict = {}
@@ -62,10 +71,7 @@ def monitor_sensors():
             write_log_to_db(f"✅ Hydration and fertilization completed.")
             # taking foto and calculating ndvi-value.
             write_log_to_db(f"🎥 Taking foto and calculating NDVI-value...")
-            if camera_demo_mode:
-                foto_arr, ndvi_val = get_ndvi_value_demo()
-            else:
-                foto_arr, ndvi_val = get_ndvi_value()
+            foto_arr, ndvi_val = get_ndvi_value()
             write_log_to_db(f"✅ NDVI-value: {ndvi_val}")
             write_to_db(total_meas_time, hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val, )
             write_log_to_db("🎉😃 Overall measurement completed and data written to DB.")

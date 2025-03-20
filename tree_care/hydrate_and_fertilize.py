@@ -71,6 +71,13 @@ def get_hydration_and_fertilizer_seconds_values(avg_meas_dict):
     return hydration_seconds, fertilizer_seconds
 
 def hydrate_fertilize_tree(avg_meas_dict, arduino_port='/dev/ttyUSB0'):
+    if arduino_port == 'DEMO':
+        return{
+            "hydration": True,
+            "hydration_seconds": 5, 
+            "fertilize": True,
+            "fertilizer_seconds": 2,
+        }
     hydration_seconds, fertilizer_seconds = get_hydration_and_fertilizer_seconds_values(avg_meas_dict)
     arduino = serial.Serial(arduino_port, 9600)
     # Wait for the Arduino to initialize

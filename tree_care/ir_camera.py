@@ -7,7 +7,6 @@ from libcamera import controls
 import cv2
 from fastiecm import fastiecm
 import datetime
-from scp_image import send_image_scp
 import base64
 import cv2
 

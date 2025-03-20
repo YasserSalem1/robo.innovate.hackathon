@@ -10,7 +10,7 @@ import random
 def get_avg_measurement_outputs(meas_dict):
     for key, values in meas_dict.items():
         meas_dict[key] = [0 if v is None or np.isnan(v) else v for v in values]
-    avg_meas_dict = {key: sum(values)/np.min([1, len(values)]) if len(values) > 0 else 0 for key, values in meas_dict.items()}
+    avg_meas_dict = {key: sum(values)/np.max([1, len(values)]) if len(values) > 0 else 0 for key, values in meas_dict.items()}
     return avg_meas_dict
 
 class DemoSoilSensor:

@@ -8,9 +8,10 @@ from soil_and_hum_sensors import get_avg_measurement_outputs, SoilSensor, Humidi
 
 HUMIDITY_SENSOR_THRESHOLD = 7
 
-demo_mode = True
+demo_mode = False
 raspberry_pi = True
-camera_demo_mode = True
+camera_demo_mode = False
+pump_demo_mode = True
 
 
 if demo_mode:
@@ -69,7 +70,7 @@ def monitor_sensors():
             avg_meas_dict = get_avg_measurement_outputs({**humidity_meas_dict, **soil_meas_dict})
             mean_val_str = ', '.join([f"{key}: {value}" for key, value in avg_meas_dict.items()])
             write_log_to_db(f"📊 Measured mean values: {mean_val_str}")
-            hydration_fertilize_dict = hydrate_fertilize_tree(avg_meas_dict, arduino_port=pump_arduino_port)
+            hydration_fertilize_dict = hydrate_fertilize_tree(avg_meas_dict, arduino_port=pump_arduino_port, demo=pump_demo_mode)
             write_log_to_db(f"✅ Hydration and fertilization completed.")
             # taking foto and calculating ndvi-value.
             write_log_to_db(f"🎥 Taking foto and calculating NDVI-value...")

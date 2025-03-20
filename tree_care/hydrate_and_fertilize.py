@@ -7,7 +7,7 @@ import random
 from write_to_db import write_log_to_db
 
 # Function to control a pump
-def control_pump(pump, seconds, arduino):
+def control_pump(pump, seconds, arduino, demo=False):
     if pump == 'fertilize':
         pin = 2
         write_log_to_db(f"🌱 Fertilizing for {seconds} seconds...")
@@ -20,22 +20,24 @@ def control_pump(pump, seconds, arduino):
 
     # Turn pump ON
     command_on = f"{pin} HIGH\n"
-    arduino.write(command_on.encode())
+    if not demo:
+        arduino.write(command_on.encode())
     #print(f"Sent: {command_on.strip()}")
     time.sleep(seconds)
 
     # Turn pump OFF
     command_off = f"{pin} LOW\n"
-    arduino.write(command_off.encode())
+    if not demo:
+        arduino.write(command_off.encode())
     #print(f"Sent: {command_off.strip()}")
 
     time.sleep(0.1)  # Allow Arduino to process
     arduino.flush()  # Clear buffer
 
 # Function to control both pumps
-def control_both_pumps(fertilize_seconds, hydrate_seconds, arduino):
-    fertilize_thread = threading.Thread(target=control_pump, args=("fertilize", fertilize_seconds, arduino))
-    hydrate_thread = threading.Thread(target=control_pump, args=("hydrate", hydrate_seconds, arduino))
+def control_both_pumps(fertilize_seconds, hydrate_seconds, arduino, demo=False):
+    fertilize_thread = threading.Thread(target=control_pump, args=("fertilize", fertilize_seconds, arduino, demo))
+    hydrate_thread = threading.Thread(target=control_pump, args=("hydrate", hydrate_seconds, arduino, demo))
     
     fertilize_thread.start()
     hydrate_thread.start()
@@ -70,7 +72,7 @@ def get_hydration_and_fertilizer_seconds_values(avg_meas_dict):
     # fertilizer_seconds = random.uniform(0, 4)
     return hydration_seconds, fertilizer_seconds
 
-def hydrate_fertilize_tree(avg_meas_dict, arduino_port='/dev/ttyUSB0'):
+def hydrate_fertilize_tree(avg_meas_dict, arduino_port='/dev/ttyUSB0', demo=False):
     if arduino_port == 'DEMO':
         return{
             "hydration": True,
@@ -83,11 +85,11 @@ def hydrate_fertilize_tree(avg_meas_dict, arduino_port='/dev/ttyUSB0'):
     # Wait for the Arduino to initialize
     time.sleep(2)
     if hydration_seconds > 0 and fertilizer_seconds > 0:
-        control_both_pumps(fertilize_seconds=fertilizer_seconds, hydrate_seconds=hydration_seconds, arduino=arduino)
+        control_both_pumps(fertilize_seconds=fertilizer_seconds, hydrate_seconds=hydration_seconds, arduino=arduino, demo=demo)
     elif hydration_seconds > 0:
-        control_pump(pump='hydrate', seconds=hydration_seconds, arduino=arduino)
+        control_pump(pump='hydrate', seconds=hydration_seconds, arduino=arduino, demo=demo)
     elif fertilizer_seconds > 0:
-        control_pump(pump='fertilize', seconds=fertilizer_seconds, arduino=arduino)
+        control_pump(pump='fertilize', seconds=fertilizer_seconds, arduino=arduino, demo=demo)
     hydration_fertilize_dict = {
         "hydration": hydration_seconds > 0,
         "hydration_seconds": hydration_seconds, 

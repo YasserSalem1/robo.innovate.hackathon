@@ -4,10 +4,10 @@ from datetime import datetime
 
 
 def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val, pic_string_orig, pic_string_ndvi):
-    print("Writing to DB:", hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val)
-    print(total_meas_time)
-    print(hydration_fertilize_dict)
-    print(avg_meas_dict)
+    # print("Writing to DB:", hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val)
+    # print(total_meas_time)
+    # print(hydration_fertilize_dict)
+    # print(avg_meas_dict)
     # Airtable API Details
     AIRTABLE_PAT = "patSZ2hnMBit4Db56.13a6845603b208a4ae3454d52ed7f0b3e7dc3117e56f6f64379fc9ffedb0ed53"
     BASE_ID = "app7lrr5pdlyuaoI8"
@@ -93,13 +93,13 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
             records = response.json().get("records", [])
             if records:
                 last_record = records[0]["fields"]
-                print("✅ Last Measurement Record:", json.dumps(last_record, indent=4))
+                # print("✅ Last Measurement Record:", json.dumps(last_record, indent=4))
                 return last_record
             else:
-                print("⚠️ No records found in 'Measurements'.")
+                # print("⚠️ No records found in 'Measurements'.")
                 return None
         else:
-            print("❌ Error Fetching Last Record:", response.status_code, response.text)
+            # print("❌ Error Fetching Last Record:", response.status_code, response.text)
             return None
 
     # ✅ Fetch the last measurement entry
@@ -107,10 +107,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
 
     last_id = last_record.get("ID")  # Extract only the ID
 
-    print(last_id)  # Output: 12
+    # print(last_id)  # Output: 12
     
     def send_new_measurement(last_id):
-        print("hiii")
+        # print("hiii")
         new_id = int(last_id) + 1  # Increment the last ID by 1
         # Prepare the data payload
         data = {
@@ -144,10 +144,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         # Send data to Airtable
         response = requests.post(URL, headers=HEADERS, data=json.dumps(data))
 
-        if response.status_code in [200, 201]:  # 201 = Created
-            print("✅ New measurement record created:", response.json())
-        else:
-            print("❌ Error:", response.status_code, response.text)
+        # if response.status_code in [200, 201]:  # 201 = Created
+            # print("✅ New measurement record created:", response.json())
+        # else:
+            # print("❌ Error:", response.status_code, response.text)
 
     
     send_new_measurement(last_id)
@@ -168,18 +168,18 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
             records = response.json().get("records", [])
             if records:
                 last_record = records[0]["fields"]
-                print("✅ Last Measurement2 Record:", json.dumps(last_record, indent=4))
+                # print("✅ Last Measurement2 Record:", json.dumps(last_record, indent=4))
                 return last_record
             else:
-                print("⚠️ No records found in 'Measurements2'.")
+                # print("⚠️ No records found in 'Measurements2'.")
                 return None
         else:
-            print("❌ Error Fetching Last Record from Measurements2:", response.status_code, response.text)
+            # print("❌ Error Fetching Last Record from Measurements2:", response.status_code, response.text)
             return None
     def send_npk_measurements(mean_N, mean_P, mean_K):
         # Ensure mean values are not None
         if mean_N is None or mean_P is None or mean_K is None:
-            print("❌ Error: Missing NPK mean values")
+            # print("❌ Error: Missing NPK mean values")
             return
 
         # Fetch last ID from Measurements2 table
@@ -208,10 +208,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         # Send data to Airtable
         response = requests.post(URL, headers=HEADERS, data=json.dumps(data))
 
-        if response.status_code in [200, 201]:  # 201 = Created
-            print("✅ NPK measurement record created:", response.json())
-        else:
-            print("❌ Error:", response.status_code, response.text)
+        # if response.status_code in [200, 201]:  # 201 = Created
+            # print("✅ NPK measurement record created:", response.json())
+        # else:
+            # print("❌ Error:", response.status_code, response.text)
             
         # Call the function to send NPK data
     mean_N = list(avg_meas_dict.items())[4][1]
@@ -235,13 +235,13 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
             if data.get('records'):
                 last_record = data['records'][0]
                 last_id = last_record['fields'].get('ID', 0)  # Get the 'ID' of the last record
-                print(f"Last ID: {last_id}")
+                # print(f"Last ID: {last_id}")
                 return last_id
             else:
-                print("No records found.")
+                # print("No records found.")
                 return 0  # If no records exist, return 0
         else:
-            print(f"Error fetching last entry: {response.status_code}")
+            # print(f"Error fetching last entry: {response.status_code}")
             return 0
 
     # Function to send data to Airtable
@@ -259,14 +259,14 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         response = requests.post(URL_ACTION, headers=HEADERS, data=json.dumps(payload))
 
         # Check if the request was successful
-        if response.status_code in [200, 201]:
-            print("✅ Record created successfully:", response.json())
-        else:
-            print("❌ Error creating record:", response.status_code, response.text)
+        # if response.status_code in [200, 201]:
+            # print("✅ Record created successfully:", response.json())
+        # else:
+            # print("❌ Error creating record:", response.status_code, response.text)
 
     # Get the last ID from the table and increment it
     last_id = get_last_entry_id()
-    print(type(last_id))
+    # print(type(last_id))
     new_id = int(last_id) + 1  # Increment the last ID by 1
 
     # Get the current date dynamically
@@ -304,20 +304,20 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
             records = response.json().get("records", [])
             if records:
                 last_record = records[0]["fields"]
-                print("✅ Last NDVI Measurement Record:", json.dumps(last_record, indent=4))
+                # print("✅ Last NDVI Measurement Record:", json.dumps(last_record, indent=4))
                 return last_record
             else:
-                print("⚠️ No records found in 'Measurements3'.")
+                # print("⚠️ No records found in 'Measurements3'.")
                 return None
         else:
-            print("❌ Error Fetching Last Record from Measurements3:", response.status_code, response.text)
+            # print("❌ Error Fetching Last Record from Measurements3:", response.status_code, response.text)
             return None
 
     # Function to send NDVI measurement to Airtable
     def send_ndvi_measurement(ndvi_val):
         # Ensure NDVI value is not None
         if ndvi_val is None:
-            print("❌ Error: Missing NDVI value")
+            # print("❌ Error: Missing NDVI value")
             return
 
         # Fetch the last ID from Measurements3 table
@@ -345,10 +345,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         # Send data to Airtable
         response = requests.post(URL, headers=HEADERS, data=json.dumps(data))
 
-        if response.status_code in [200, 201]:  # 201 = Created
-            print("✅ NDVI measurement record created:", response.json())
-        else:
-            print("❌ Error:", response.status_code, response.text)
+        # if response.status_code in [200, 201]:  # 201 = Created
+            # print("✅ NDVI measurement record created:", response.json())
+        # else:
+            # print("❌ Error:", response.status_code, response.text)
 
     # Call the function to send NDVI data
     send_ndvi_measurement(ndvi_val)
@@ -371,10 +371,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         response = requests.post(URL_ACTION, headers=HEADERS, data=json.dumps(payload))
 
         # Check if the request was successful
-        if response.status_code in [200, 201]:
-            print("✅ Record created successfully:", response.json())
-        else:
-            print("❌ Error creating record:", response.status_code, response.text)
+        # if response.status_code in [200, 201]:
+            # print("✅ Record created successfully:", response.json())
+        # else:
+            # print("❌ Error creating record:", response.status_code, response.text)
     
     
     ###################pic#############################
@@ -392,13 +392,13 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
             records = response.json().get("records", [])
             if records:
                 last_record = records[0]["fields"]
-                print("✅ Last Pic Record:", json.dumps(last_record, indent=4))
+                # print("✅ Last Pic Record:", json.dumps(last_record, indent=4))
                 return last_record
             else:
-                print("⚠️ No records found in 'Pics'.")
+                # print("⚠️ No records found in 'Pics'.")
                 return None
         else:
-            print("❌ Error Fetching Last Record from Pics:", response.status_code, response.text)
+            # print("❌ Error Fetching Last Record from Pics:", response.status_code, response.text)
             return None
 
     # Function to send pic data to Airtable
@@ -426,10 +426,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         # Send data to Airtable
         response = requests.post(URL_pics, headers=HEADERS, data=json.dumps(data))
 
-        if response.status_code in [200, 201]:  # 201 = Created
-            print("✅ Pic record created successfully:", response.json())
-        else:
-            print("❌ Error sending pic data:", response.status_code, response.text)
+        # if response.status_code in [200, 201]:  # 201 = Created
+            # print("✅ Pic record created successfully:", response.json())
+        # else:
+            # print("❌ Error sending pic data:", response.status_code, response.text)
 
     # Call the function to send pic data
     send_pic_data(pic_string_orig, pic_string_ndvi)
@@ -470,6 +470,6 @@ def write_log_to_db(log_msg):
 #write_to_db(1,hydration_fertilize_dict,avg_meas_dict,3,3)
 
 
-#print(list(hydration_fertilize_dict.items())[0][1])
+# #print(list(hydration_fertilize_dict.items())[0][1])
 
 #write_to_db(3,hydration_fertilize_dict,avg_meas_dict,3,3,"asd21324lj3j4","adskfjshdfsafj3")

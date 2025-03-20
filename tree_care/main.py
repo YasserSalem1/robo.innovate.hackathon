@@ -29,9 +29,11 @@ else:
 if camera_demo_mode:
     def get_ndvi_value():
         # TODO Implement logic to get NDVI value from camera
-        foto_arr = [random.randint(0, 255) for _ in range(100)]
+        # foto_arr = [random.randint(0, 255) for _ in range(100)]
+        pic_string_orig = ''
+        pic_string_ndvi = ''
         ndvi_val = random.uniform(0, 1)
-        return foto_arr, ndvi_val
+        return pic_string_orig, pic_string_ndvi, ndvi_val
 else:
     from ir_camera import get_ndvi_value
 
@@ -71,9 +73,9 @@ def monitor_sensors():
             write_log_to_db(f"✅ Hydration and fertilization completed.")
             # taking foto and calculating ndvi-value.
             write_log_to_db(f"🎥 Taking foto and calculating NDVI-value...")
-            foto_arr, ndvi_val = get_ndvi_value()
+            pic_string_orig, pic_string_ndvi, ndvi_val = get_ndvi_value()
             write_log_to_db(f"✅ NDVI-value: {ndvi_val}")
-            write_to_db(total_meas_time, hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val, )
+            write_to_db(total_meas_time, hydration_fertilize_dict, avg_meas_dict, 3, ndvi_val, pic_string_orig, pic_string_ndvi)
             write_log_to_db("🎉😃 Overall measurement completed and data written to DB.")
         time.sleep(1)  # Check humidity_sensor value every second
 

@@ -8,6 +8,8 @@ import cv2
 from fastiecm import fastiecm
 import datetime
 from scp_image import send_image_scp
+import base64
+import cv2
 
 def contrast_stretch(im):
     in_min = np.percentile(im, 5)
@@ -31,6 +33,23 @@ def calc_ndvi(image):
     bottom[bottom == 0] = 0.01  # Avoid division by zero
     ndvi = (b.astype(float) - r) / bottom
     return ndvi
+
+def encode_image_to_base64(image_path):
+    """Encodes an image file to a Base64 string."""
+    with open(image_path, "rb") as img_file:
+        encoded_string = base64.b64encode(img_file.read()).decode("utf-8")
+    return encoded_string
+
+def get_encoded_images():
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    """Captures images, processes them, and returns encoded Base64 strings."""
+    original_image_path = f"./output/{timestamp}_tree.jpg"
+    color_mapped_image_path = f"./output/{timestamp}_tree_color_mapped_image.png"
+
+    original_encoded = encode_image_to_base64(original_image_path)
+    color_mapped_encoded = encode_image_to_base64(color_mapped_image_path)
+
+    return original_encoded, color_mapped_encoded
 
 def get_ndvi_value():
     # Inputs for the picture - informatio nsuch as tree id
@@ -103,7 +122,13 @@ def get_ndvi_value():
 
     picam2.stop_preview()
     picam2.stop()
-    return [random.randint(0, 255) for _ in range(100)], mean_ndvi
+
+    # Encode images
+    original_encoded = encode_image_to_base64(image_filename)
+    color_mapped_encoded = encode_image_to_base64(color_mapped_image_path)
+
+    return original_encoded, color_mapped_encoded, mean_ndvi
+    #return [random.randint(0, 255) for _ in range(100)], mean_ndvi
 
 def get_ndvi_value_demo():
     # TODO Implement logic to get NDVI value from camera

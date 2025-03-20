@@ -82,10 +82,10 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
     ### ✅ FUNCTION: Fetch Last Record from "Measurements" Table ###
     def get_last_measurement():
         params = {
-            "sort[0][field]": "Date",  # Sort by Date (latest first)
+            "sort[0][field]": "ID",  # Sort by ID instead of Date
             "sort[0][direction]": "desc",
-            "maxRecords": 1  # Get only the latest record
-        }
+            "maxRecords": 1
+            }
 
         response = requests.get(URL_MEASUREMENTS, headers=HEADERS, params=params)
 
@@ -107,7 +107,7 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
 
     last_id = last_record.get("ID")  # Extract only the ID
 
-    # print(last_id)  # Output: 12
+    print(last_id) 
     
     def send_new_measurement(last_id):
         # print("hiii")
@@ -450,26 +450,26 @@ def write_log_to_db(log_msg):
     }
     
 
-#avg_meas_dict = {
-#  "TEM": 2,
-#  "HUM": 234,
-#  "PH": 64,
-#  "EC": 3,
-#  "N": 3,
-#  "P": 5,
-#  "K": 4
-#}
+avg_meas_dict = {
+  "TEM": 2,
+  "HUM": 234,
+  "PH": 64,
+  "EC": 3,
+  "N": 3,
+  "P": 5,
+  "K": 4
+}
 
-#hydration_fertilize_dict = {
-#        "hydration": True,
-#        "hydration_seconds": 3, 
-#        "fertilize": True,
-#        "fertilizer_seconds": 3
-#    }
+hydration_fertilize_dict = {
+        "hydration": True,
+        "hydration_seconds": 3, 
+        "fertilize": True,
+        "fertilizer_seconds": 3
+    }
 
 #write_to_db(1,hydration_fertilize_dict,avg_meas_dict,3,3)
 
 
 # #print(list(hydration_fertilize_dict.items())[0][1])
 
-#write_to_db(3,hydration_fertilize_dict,avg_meas_dict,3,3,"asd21324lj3j4","adskfjshdfsafj3")
+write_to_db(3,hydration_fertilize_dict,avg_meas_dict,3,3,"asd21324lj3j4","adskfjshdfsafj3")

@@ -439,37 +439,37 @@ def write_log_to_db(log_msg):
     print("Log:", log_msg)
 
 
-    # Real-time data logging
-    # Fetch data (e.g., sensor data, to be used for logging and sending to Airtable)
-    # Assuming you have your data collection mechanism here (replace with real sensor data)
-    sensor_data = {
-        "Temperature": 22.5,  # Example temperature
-        "Humidity": 65.2,     # Example humidity
-        "EC": 1.8,            # Example EC value
-        "pH": 6.4             # Example pH value
-    }
+#     # Real-time data logging
+#     # Fetch data (e.g., sensor data, to be used for logging and sending to Airtable)
+#     # Assuming you have your data collection mechanism here (replace with real sensor data)
+#     sensor_data = {
+#         "Temperature": 22.5,  # Example temperature
+#         "Humidity": 65.2,     # Example humidity
+#         "EC": 1.8,            # Example EC value
+#         "pH": 6.4             # Example pH value
+#     }
     
 
-avg_meas_dict = {
-  "TEM": 2,
-  "HUM": 234,
-  "PH": 64,
-  "EC": 3,
-  "N": 3,
-  "P": 5,
-  "K": 4
-}
+# avg_meas_dict = {
+#   "TEM": 2,
+#   "HUM": 234,
+#   "PH": 64,
+#   "EC": 3,
+#   "N": 3,
+#   "P": 5,
+#   "K": 4
+# }
 
-hydration_fertilize_dict = {
-        "hydration": True,
-        "hydration_seconds": 3, 
-        "fertilize": True,
-        "fertilizer_seconds": 3
-    }
+# hydration_fertilize_dict = {
+#         "hydration": True,
+#         "hydration_seconds": 3, 
+#         "fertilize": True,
+#         "fertilizer_seconds": 3
+#     }
 
-#write_to_db(1,hydration_fertilize_dict,avg_meas_dict,3,3)
+# #write_to_db(1,hydration_fertilize_dict,avg_meas_dict,3,3)
 
 
-# #print(list(hydration_fertilize_dict.items())[0][1])
+# # #print(list(hydration_fertilize_dict.items())[0][1])
 
-write_to_db(3,hydration_fertilize_dict,avg_meas_dict,3,3,"asd21324lj3j4","adskfjshdfsafj3")
+# write_to_db(3,hydration_fertilize_dict,avg_meas_dict,3,3,"asd21324lj3j4","adskfjshdfsafj3")

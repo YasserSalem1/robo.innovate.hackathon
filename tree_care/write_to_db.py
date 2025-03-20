@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 
-def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val):
+def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val, pic_string_orig, pic_string_ndvi):
     print("Writing to DB:", hydration_fertilize_dict, avg_meas_dict, foto_arr, ndvi_val)
     print(total_meas_time)
     print(hydration_fertilize_dict)
@@ -24,11 +24,18 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
     TABLE_NAME_NDVI = "Measurements3"
     TABLE_ID_NDVI = "tblMZ8mKOfin2Dj0T"
 
+    TABLE_NAME_NDVI = "Measurements3"
+    TABLE_ID_NDVI = "tblMZ8mKOfin2Dj0T"
+
+    TABLE_NAME_pics = "Pics"
+    TABLE_ID_pics = "tblpc4DLJfqthw6MG"
+
     # Airtable API URLs
     URL_MEASUREMENTS = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID_MEASUREMENTS}"
     URL_MEASUREMENTS2 = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID_MEASUREMENTS2}"
     URL_ACTION = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID_ACTION}"
     URL_MEASUREMENTS3 = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID_NDVI}"
+    URL_pics = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID_pics}"
 
     # Headers with PAT
     HEADERS = {
@@ -369,6 +376,65 @@ def write_to_db(total_meas_time,hydration_fertilize_dict, avg_meas_dict, foto_ar
         else:
             print("❌ Error creating record:", response.status_code, response.text)
     
+    
+    ###################pic#############################
+     # Function to get the last entry ID from the "Pics" table
+    def get_last_pic_entry_id():
+        params = {
+            "sort[0][field]": "ID",  # Sort by ID (latest first)
+            "sort[0][direction]": "desc",
+            "maxRecords": 1  # Get only the latest record
+        }
+
+        response = requests.get(URL_pics, headers=HEADERS, params=params)
+
+        if response.status_code == 200:
+            records = response.json().get("records", [])
+            if records:
+                last_record = records[0]["fields"]
+                print("✅ Last Pic Record:", json.dumps(last_record, indent=4))
+                return last_record
+            else:
+                print("⚠️ No records found in 'Pics'.")
+                return None
+        else:
+            print("❌ Error Fetching Last Record from Pics:", response.status_code, response.text)
+            return None
+
+    # Function to send pic data to Airtable
+    def send_pic_data(pic_string_orig, pic_string_ndvi):
+        # Fetch the last ID from Pics table
+        last_record = get_last_pic_entry_id()
+        last_id = int(last_record.get("ID", 0)) if last_record else 0
+        new_id = last_id + 1  # Increment last ID
+
+        # Prepare the data payload
+        data = {
+            "records": [
+                {
+                    "fields": {
+                        "ID": str(new_id),  # Convert to string for Airtable
+                        "TreeID": "32",  # Fixed TreeID
+                        "Date": current_date,  # Current date
+                        "pic_string_orig": pic_string_orig,  # Original Picture String
+                        "pic_string_ndvi": pic_string_ndvi  # NDVI Picture String
+                    }
+                }
+            ]
+        }
+
+        # Send data to Airtable
+        response = requests.post(URL_pics, headers=HEADERS, data=json.dumps(data))
+
+        if response.status_code in [200, 201]:  # 201 = Created
+            print("✅ Pic record created successfully:", response.json())
+        else:
+            print("❌ Error sending pic data:", response.status_code, response.text)
+
+    # Call the function to send pic data
+    send_pic_data(pic_string_orig, pic_string_ndvi)
+    ###################pics#############################
+    
 def write_log_to_db(log_msg):
     print("Log:", log_msg)
 
@@ -405,3 +471,5 @@ def write_log_to_db(log_msg):
 
 
 #print(list(hydration_fertilize_dict.items())[0][1])
+
+#write_to_db(3,hydration_fertilize_dict,avg_meas_dict,3,3,"asd21324lj3j4","adskfjshdfsafj3")

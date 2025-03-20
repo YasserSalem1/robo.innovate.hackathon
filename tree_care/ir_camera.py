@@ -56,7 +56,7 @@ def get_ndvi_value():
     picam2 = Picamera2()
 
     # Start camera
-    picam2.start(show_preview=True)
+    picam2.start(show_preview=False)
     time.sleep(1)
     picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
     time.sleep(1)
